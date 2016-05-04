@@ -13,11 +13,8 @@
 
 # Imports
 import threading
-# For autocompletion
-import readline,rlcompleter
-readline.parse_and_bind("tab: complete")
-
 import time
+import IPython
 
 # Imports need to be done like this, to only import the module once,
 # even if it is imported again in another module!
@@ -81,6 +78,4 @@ def quit():
     
 # Display introduction?
 
-    
-    
-    
+IPython.embed()
