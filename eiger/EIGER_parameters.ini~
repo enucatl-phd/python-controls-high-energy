@@ -1,6 +1,0 @@
-[EIGER_parameters]
-IP                     =   129.129.99.99
-storagePath            =   /sls/X02DA/data/e14980/Data20/EIGER_DATA
-photonEnergy		=  35000
-thresholdEnergy		=  18000
-
