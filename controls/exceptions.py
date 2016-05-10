@@ -1,5 +1,5 @@
 ########################################################################
-# 
+#
 # gantry_control_exceptions.py
 #
 # Exception package for python based gantry control
@@ -11,51 +11,36 @@
 #
 ########################################################################
 
-# Parent class
-class GantryError(Exception):
-    """ Parent class for all custom Gantry errors
-    
-        Functions:
-            
-            __init__(message): stores and prints error message
-                
-    """
-    def __init__(self, message):
-        # Call the base class constructor with the parameters it needs
-        Exception.__init__(self, '\n'+message)
 
-# Derived classes       
-class ErrorTubeInterrupt(GantryError):
-    """ Tube error, inherits from GantryError
-                    
-    """
-        
-class ErrorSerialInterrupt(GantryError):
-    """ Serial (connection) error, inherits from GantryError
-                    
-    """
-        
-class ErrorCameraInterrupt(GantryError):
-    """ Camera (server) error, inherits from GantryError
-                    
+class PythonControlsError(Exception):
+    pass
+
+
+class TubeInterrupt(PythonControlsError):
+    """ Tube error
+
     """
 
-class ErrorScanInterrupt(GantryError):
-    """ Error during DPC or tomography scan, inherits from GantryError
-                    
-    """
-        
-class ErrorMotorInterrupt(GantryError):
-    """ Motor error, inherits from GantryError
-                    
+
+class SerialInterrupt(PythonControlsError):
+    """ Serial (connection) error
+
     """
 
-# Error/Warning handling
-#try:
-# 	#code
-# 	#doing stuff
-# 	#and error occurs (exception is raised)
-# 	 	
-#except: 
-#	#handling exception (e.g. clean up, soft-stops etc.)
-# 	#if necessray: reraise exception with "raise" command
+
+class CameraInterrupt(PythonControlsError):
+    """ Camera (server) error
+
+    """
+
+
+class ScanInterrupt(PythonControlsError):
+    """  during DPC or tomography scan
+
+    """
+
+
+class MotorInterrupt(PythonControlsError):
+    """ Motor error
+
+    """
