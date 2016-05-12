@@ -41,6 +41,8 @@ class ScanInterrupt(PythonControlsError):
 
 
 class MotorInterrupt(PythonControlsError):
-    """ Motor error
+    """ Motor error"""
 
-    """
+
+class EigerError(PythonControlsError):
+    """Eiger detector error"""

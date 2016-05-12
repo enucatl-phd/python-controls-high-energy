@@ -21,7 +21,6 @@ class Motor():
     """
     def __init__(
             self,
-            name,
             epics_name,
             description,
             init=False,
@@ -32,9 +31,7 @@ class Motor():
 
             Input variables:
 
-                name: Motor name
                 epics_name: Motor name in EPICS
-                description: brief description
                 description: brief description
                 init: if true, move to initialization position
                       (default: False)
@@ -51,7 +48,6 @@ class Motor():
         self._wait_for_finish = wait_for_finish
 
         # Instance variables
-        self._name = name
         self._epics_name = epics_name
         self._description = description
 
@@ -75,16 +71,16 @@ class Motor():
 
         """
         if self._motor_disabled:
-            raise ErrorMotorInterrupt(
-                "\n[WARNING]: Motor [{0}] is disabled".format(self._name)
+            raise MotorInterrupt(
+                "Motor [{0}] is disabled".format(self._epics_name)
             )
 
         # Check validity of absolute position
         if absolute_position > self._hlm or absolute_position < self._llm:
-            raise ErrorMotorInterrupt(
-                "\n[Error]: Moving motor [{0}] to position\
+            raise MotorInterrupt(
+                "Moving motor [{0}] to position\
                 [{1}] failed: position out of range.".format(
-                    self._name, position))
+                    self._epics_name, position))
 
         # Set new position and wait (if necessary) for finish
         self._pv.put(absolute_position, self._wait_for_finish)
@@ -104,17 +100,17 @@ class Motor():
 
         """
         if self._motor_disabled:
-            raise ErrorMotorInterrupt("\n[WARNING]: Motor [{0}] is disabled"
-                                      .format(self._name))
+            raise MotorInterrupt("Motor [{0}] is disabled"
+                                 .format(self._epics_name))
 
         # Calculate absolute position
         absolute_position = self.get_current_value() + relative_position
         # Check validity of absolute position
         if absolute_position > self._hlm or absolute_position < self._llm:
-            raise ErrorMotorInterrupt(
-                "\n[Error]: Moving motor [{0}] to position\
+            raise MotorInterrupt(
+                "Moving motor [{0}] to position\
                 [{1}] failed: position out of range.".format(
-                    self._name, position))
+                    self._epics_name, position))
 
         # Set new position and wait (if necessary) for finish
         self._pv.put(absolute_position, self._wait_for_finish)
@@ -166,10 +162,9 @@ class Motor():
 
     # Print Info of single motor
     def __str__(self):
-        """ Print name, epics name and descritpion of motor
+        """ Print epics name and description of motor
         """
-        return "\n{0}\t\t{1}\t\t{2}\t\t{3}".format(
-            self._name,
+        return "\n{0}\t\t{1}\t\t{2}".format(
             self._epics_name,
             self._description,
             self.get_current_value())
