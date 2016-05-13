@@ -30,12 +30,15 @@ setup(
     ],
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
+        'numpy',
+        'scipy',
         'click',
+        'ipython',
         'pyepics',
         'pyserial',
     ],
     entry_points="""
     [console_scripts]
-    bunker4controls = bin.bunker4controls:main
+    bunker4controls = controls.bin.bunker4controls:main
     """
 )

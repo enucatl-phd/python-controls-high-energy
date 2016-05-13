@@ -11,14 +11,14 @@
 # Imports
 import click
 import IPython
+import logger
 
 import controls.motors
+import controls.log_config
 
-
-def main():
+@click.command()
+@click.option("--debug", default=False)
+def main(debug):
+    logging.config.dictConfig(controls.log_config.get_dict(debug))
     g0trx = controls.motors.Motor("", "")
     IPython.embed()
-
-
-if __name__ == "__main__":
-    main()
