@@ -39,6 +39,6 @@ setup(
     ],
     entry_points="""
     [console_scripts]
-    bunker4controls = controls.bin.bunker4controls:main
+    bunker4controls = controls.scripts.cli:main
     """
 )

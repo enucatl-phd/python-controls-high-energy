@@ -1,3 +1,5 @@
+import logging
+
 def get_dict(debug):
     if debug:
         level = logging.DEBUG

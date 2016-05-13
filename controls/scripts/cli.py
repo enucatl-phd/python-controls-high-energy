@@ -11,7 +11,7 @@
 # Imports
 import click
 import IPython
-import logger
+import logging.config
 
 import controls.motors
 import controls.log_config
