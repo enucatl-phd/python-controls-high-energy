@@ -20,5 +20,5 @@ import controls.log_config
 @click.option("--debug", default=False)
 def main(debug):
     logging.config.dictConfig(controls.log_config.get_dict(debug))
-    g0trx = controls.motors.Motor("", "")
+    g0trx = controls.motors.Motor("X02DA-BNK-HE:G0_TRX", "g0trx")
     IPython.embed()
