@@ -29,6 +29,17 @@ class Eiger(dectris.albula.DEigerDetector):
 
         self.storage_path = storage_path
         super(Eiger, self).__init__(host, port)
+        logger.debug(
+            "eiger version %s returns status %s",
+            self.version(),
+            self.status()
+        )
+        self.setNImages(1)
+        logger.debug(
+            "eiger version %s returns status %s",
+            self.version(),
+            self.status()
+        )
         self.stream = dectris.albula.DEigerStream(host, port)
         self.stream.setEnabled(True)
         self.initialize()

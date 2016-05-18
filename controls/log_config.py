@@ -1,12 +1,11 @@
-import logging
-
 def get_dict(debug):
     if debug:
-        level = logging.DEBUG
+        level = 'DEBUG'
     else:
-        level = logging.ERROR
+        level = 'ERROR'
     return dict(
         version = 1,
+        disable_existing_loggers = False,
         formatters = {
             'f': {'format':
                   '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
