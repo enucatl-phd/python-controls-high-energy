@@ -1,8 +1,5 @@
 def get_dict(verbose):
     levels = [
-        'CRITICAL',
-        'ERROR',
-        'WARNING'
         'INFO',
         'DEBUG',
     ]

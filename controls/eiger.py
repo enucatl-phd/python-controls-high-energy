@@ -1,19 +1,5 @@
-#
-# EIGER_Client_v3.py
-# Python Client of the EIGER detector with Albula v 3.0.0
-#
-#
-# Author: Zhentian Wang
-#
-#
-# History:
-# 01.06.2015: first release
-#
-#################################################################
-
 import dectris.albula
-
-import scipy.io as sio
+import os
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,39 +15,36 @@ class Eiger(dectris.albula.DEigerDetector):
 
         self.storage_path = storage_path
         super(Eiger, self).__init__(host, port)
-        logger.debug(
-            "eiger version %s returns status %s",
-            self.version(),
-            self.status()
-        )
-        self.setNImages(1)
-        logger.debug(
-            "eiger version %s returns status %s",
-            self.version(),
-            self.status()
-        )
+        self.initialize()
         self.stream = dectris.albula.DEigerStream(host, port)
         self.stream.setEnabled(True)
-        self.initialize()
-        logger.debug("Set energy to %s eV", self.photon_energy)
-        self.setPhotonEnergy(photon_energy)
-        self.setNImages(1)
         logger.debug(
             "eiger version %s returns status %s",
             self.version(),
             self.status()
         )
+        logger.debug(
+            "eiger stream version %s returns status %s",
+            self.stream.version(),
+            self.stream.enabled()
+        )
+        logger.debug("Set energy to %s eV", photon_energy)
+        self.setPhotonEnergy(photon_energy)
+        self.setNImages(1)
 
-    def snap(self, exposure_time):
+    def snap(self, exposure_time=1):
         self.setFrameTime(exposure_time + 0.000020)
         self.setCountTime(exposure_time)
         self.arm()
         self.trigger()
         self.disarm()
-        image, series_id, sequence_id = self.stream.pop()
-        logger.debug(
-            "Image recorded. %s %s %s",
-            image,
-            series_id,
-            sequence_id
+        config = self.stream.pop()
+        data = self.stream.pop()
+        end = self.stream.pop()
+        output_file = os.path.join(
+            self.storage_path,
+            "series_{0}.h5".format(config["series"])
         )
+        logger.info("eiger image saved to %s", output_file)
+        with dectris.albula.DHdf5Writer(output_file, 0, config["config"]) as hdf5_writer:
+            hdf5_writer.write(data["data"])
