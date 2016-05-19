@@ -1,8 +1,12 @@
-def get_dict(debug):
-    if debug:
-        level = 'DEBUG'
-    else:
-        level = 'ERROR'
+def get_dict(verbose):
+    levels = [
+        'CRITICAL',
+        'ERROR',
+        'WARNING'
+        'INFO',
+        'DEBUG',
+    ]
+    verbose = min(len(levels) - 1, verbose)
     return dict(
         version = 1,
         disable_existing_loggers = False,
@@ -15,11 +19,11 @@ def get_dict(debug):
             'h': {
                 'class': 'logging.StreamHandler',
                 'formatter': 'f',
-                'level': level
+                'level': levels[verbose],
             }
         },
         root = {
             'handlers': ['h'],
-            'level': level,
+            'level': levels[verbose],
         },
     )
