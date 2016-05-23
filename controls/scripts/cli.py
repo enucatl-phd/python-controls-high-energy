@@ -16,6 +16,7 @@ import logging
 
 import controls.motors
 import controls.eiger
+import controls.comet_tube
 import controls.log_config
 
 @click.command()
@@ -28,4 +29,5 @@ def main(verbose):
         "129.129.99.99",
         storage_path="/afs/psi.ch/project/hedpc/raw_data/2016/eiger/2016.05.20"
     )
+    tube = controls.comet_tube.CometTube()
     IPython.embed()
