@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import serial
 
@@ -9,9 +10,9 @@ def send_string(serial, string):
         chr(2),
         string,
         chr(13)
-    )
-    logger.debug("sending %s to serial", message)
-    serial.write(message.encode())
+    ).encode()
+    logger.debug("sending to serial %s: %s\n", serial.name, message)
+    serial.write(message)
     return " ".join(serial.readline().decode().split()[1:])
 
 
