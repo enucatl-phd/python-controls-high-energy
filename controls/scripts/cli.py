@@ -17,6 +17,7 @@ import logging
 import controls.motors
 import controls.eiger
 import controls.comet_tube
+import controls.scans
 import controls.log_config
 
 @click.command()

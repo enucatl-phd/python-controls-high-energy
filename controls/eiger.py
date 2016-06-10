@@ -30,21 +30,25 @@ class Eiger(dectris.albula.DEigerDetector):
         )
         logger.debug("Set energy to %s eV", photon_energy)
         self.setPhotonEnergy(photon_energy)
-        self.setNImages(1)
+
+    def save(self):
+        config = self.stream.pop()
+        output_file = os.path.join(
+            self.storage_path,
+            "series_{0}.h5".format(config["series"])
+        )
+        with dectris.albula.DHdf5Writer(output_file, 0, config["config"]) as hdf5_writer:
+            data = self.stream.pop()
+            while data["type"] == "data":
+                hdf5_writer.write(data["data"])
+                data = detector.stream.pop()
+        logger.info("eiger image saved to %s", output_file)
 
     def snap(self, exposure_time=1):
+        self.setNImages(1)
         self.setFrameTime(exposure_time + 0.000020)
         self.setCountTime(exposure_time)
         self.arm()
         self.trigger()
         self.disarm()
-        config = self.stream.pop()
-        data = self.stream.pop()
-        end = self.stream.pop()
-        output_file = os.path.join(
-            self.storage_path,
-            "series_{0}.h5".format(config["series"])
-        )
-        logger.info("eiger image saved to %s", output_file)
-        with dectris.albula.DHdf5Writer(output_file, 0, config["config"]) as hdf5_writer:
-            hdf5_writer.write(data["data"])
+        self.save()

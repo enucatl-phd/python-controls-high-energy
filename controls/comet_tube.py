@@ -71,23 +71,23 @@ class CometTube(object):
 if __name__ == '__main__':
     tube = CometTube()
     logging.basicConfig(level=logging.DEBUG)
-    print("current error code", tube.error_code)
-    print("voltage", tube.voltage)
-    print("current", tube.current)
-    print("focus", tube.focus)
-    print("set voltage to 120")
-    tube.voltage = 120
-    print("voltage", tube.voltage)
-    print("set voltage to 160")
-    tube.voltage = 160
-    print("voltage", tube.voltage)
-    print("set current to 5")
-    tube.current = 5
-    print("current", tube.current)
-    print("set current to 10")
-    tube.current = 10
-    print("current", tube.current)
-    tube.set_small_focus()
-    print(tube.focus)
-    tube.set_large_focus()
-    print(tube.focus)
+    logger.debug("current error code %s", tube.error_code)
+    logger.debug("voltage %s", tube.voltage)
+    logger.debug("current %s", tube.current)
+    # print("focus", tube.focus)
+    # print("set voltage to 120")
+    # tube.voltage = 120
+    # print("voltage", tube.voltage)
+    # print("set voltage to 160")
+    # tube.voltage = 160
+    # print("voltage", tube.voltage)
+    # print("set current to 5")
+    # tube.current = 5
+    # print("current", tube.current)
+    # print("set current to 10")
+    # tube.current = 10
+    # print("current", tube.current)
+    # tube.set_small_focus()
+    # print(tube.focus)
+    # tube.set_large_focus()
+    # print(tube.focus)
