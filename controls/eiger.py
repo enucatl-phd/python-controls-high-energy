@@ -41,7 +41,7 @@ class Eiger(dectris.albula.DEigerDetector):
             data = self.stream.pop()
             while data["type"] == "data":
                 hdf5_writer.write(data["data"])
-                data = detector.stream.pop()
+                data = self.stream.pop()
         logger.info("eiger image saved to %s", output_file)
 
     def snap(self, exposure_time=1):
