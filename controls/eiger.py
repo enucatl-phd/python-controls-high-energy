@@ -37,6 +37,7 @@ class Eiger(dectris.albula.DEigerDetector):
             self.storage_path,
             "series_{0}.h5".format(config["series"])
         )
+        logger.debug("saving eiger image to %s ...", output_file)
         with dectris.albula.DHdf5Writer(output_file, 0, config["config"]) as hdf5_writer:
             data = self.stream.pop()
             while data["type"] == "data":

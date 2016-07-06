@@ -13,6 +13,8 @@ def dscan(detector, motor, begin, end, intervals, exposure_time=1):
         motor.mvr(begin)
         step = (end - begin) / intervals
         detector.setNImages(intervals + 1)
+        detector.setFrameTime(exposure_time + 0.000020)
+        detector.setCountTime(exposure_time)
         detector.arm()
         detector.trigger()
         for _ in range(intervals):
