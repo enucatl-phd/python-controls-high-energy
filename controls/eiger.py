@@ -10,7 +10,7 @@ class Eiger(dectris.albula.DEigerDetector):
     def __init__(self,
                  host,
                  port=80,
-                 photon_energy=35000,
+                 photon_energy=10000,
                  storage_path="."):
 
         self.storage_path = storage_path
