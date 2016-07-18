@@ -1,5 +1,10 @@
 # Installation
 
+## gcc compiler
+```
+source /opt/rh/devtoolset-2/enable
+```
+
 ## Install pyenv
 ```
 curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash

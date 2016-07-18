@@ -13,7 +13,10 @@
 
 
 import epics
+import logging
 import controls.exceptions
+
+logger = logging.getLogger(__name__)
 
 
 class Motor():
@@ -70,6 +73,9 @@ class Motor():
                 none
 
         """
+        logger.debug("%s moving to absolute position %s",
+                     self._epics_name,
+                     absolute_position)
         if self._motor_disabled:
             raise MotorInterrupt(
                 "Motor [{0}] is disabled".format(self._epics_name)
@@ -99,6 +105,9 @@ class Motor():
                 none
 
         """
+        logger.debug("%s moving relative %s",
+                     self._epics_name,
+                     relative_position)
         if self._motor_disabled:
             raise MotorInterrupt("Motor [{0}] is disabled"
                                  .format(self._epics_name))

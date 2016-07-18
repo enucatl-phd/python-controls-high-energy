@@ -1,12 +1,12 @@
-import logging
-
-def get_dict(debug):
-    if debug:
-        level = logging.DEBUG
-    else:
-        level = logging.ERROR
+def get_dict(verbose):
+    levels = [
+        'INFO',
+        'DEBUG',
+    ]
+    verbose = min(len(levels) - 1, verbose)
     return dict(
         version = 1,
+        disable_existing_loggers = False,
         formatters = {
             'f': {'format':
                   '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
@@ -16,11 +16,11 @@ def get_dict(debug):
             'h': {
                 'class': 'logging.StreamHandler',
                 'formatter': 'f',
-                'level': level
+                'level': levels[verbose],
             }
         },
         root = {
             'handlers': ['h'],
-            'level': level,
+            'level': levels[verbose],
         },
     )
