@@ -1,35 +1,11 @@
-# Copyright (C) 2013 Dectris Ltd.
-
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either
-# version 2.1 of the License, or (at your option) any later version.
-#
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
-#
-#  \file      pilatus.py
-#  \details
-#  \author    Volker Pilipp
-#  \author    Contact: support@dectris.com
-#  \version   2.2
-#  \date      07/01/2014
-#  \copyright See General Terms and Conditions (GTC) on http://www.dectris.com
-#
-#
-
-
 import socket
 import datetime
 import os
 import logging
+import tempfile
+import glob
+import shutil
+import subprocess
 
 import dectris.albula
 
@@ -37,15 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 REMOTE_IMAGE_PATH = "/home/det/python-controls-high-energy"
+SOCKET_BUFFER_SIZE = 1024
 
 
-class DPilatus(object):
+class DPilatusDetector(object):
+    "Use the same interface as the DEigerDetector class from dectris.albula"
 
     def __init__(self, host="129.129.99.81", port=41234):
-        super(DPilatus, self).__init__()
-        self.__host = host
-        self.__port = port
-        self.__socketBufferSize = 1024
+        super(DPilatusDetector, self).__init__()
+        self.host = host
+        self.port = port
 
     def initialize(self, timeout=5):
         """
@@ -59,21 +36,24 @@ class DPilatus(object):
             True if connection was established successfully else False.
         """
 
-        self.__openSocket(self.__host, timeout)
+        self.__openSocket(self.host, timeout)
         if not self.__socket:
             return False
         self.__socket.sendall("prog b*_m*_chsel 0xffff\n")
-        answer = self.__socket.recv(self.__socketBufferSize)
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
+        logger.debug(answer)
         self.__socket.settimeout(None)
         # unload flat field
         self.__socket.sendall('LdFlatField 0\n')
-        answer = self.__socket.recv(self.__socketBufferSize)
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
+        logger.debug(answer)
         # set remote image path
-        self.__socket.sendall("imgpath {0}".format(REMOTE_IMAGE_PATH))
-        answer = self.__socket.recv(self.__socketBufferSize)
+        self.__socket.sendall("imgpath {0}\n".format(REMOTE_IMAGE_PATH))
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
+        logger.debug(answer)
         return True
 
-    def close(self ):
+    def close(self):
         """
         Close connection to camserver
         """
@@ -94,76 +74,80 @@ class DPilatus(object):
         self.__abort = True;
         return self.__abort
 
-    def setPhotonEnergy(photon_energy):
-        self.__socket.sendall("SetThreshold {0}".format(photon_energy))
-        answer = self.__socket.recv(self.__socketBufferSize)
+    def setPhotonEnergy(self, photon_energy):
+        self.__socket.sendall("SetThreshold {0}\n".format(photon_energy))
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         return answer
 
-    def photonEnergy():
-        self.__socket.sendall("SetThreshold")
-        answer = self.__socket.recv(self.__socketBufferSize)
+    def photonEnergy(self):
+        self.__socket.sendall("SetThreshold\n")
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         return answer
 
-    def setCountTime(exposure_time):
-        self.__socket.sendall("Exptime {0}".format(exposure_time))
-        answer = self.__socket.recv(self.__socketBufferSize)
+    def setCountTime(self, exposure_time):
+        self.__socket.sendall("Exptime {0}\n".format(exposure_time))
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         return answer
 
-    def countTime():
-        self.__socket.sendall("Exptime")
-        answer = self.__socket.recv(self.__socketBufferSize)
+    def countTime(self):
+        self.__socket.sendall("Exptime\n")
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         return answer
 
     setFrameTime = setCountTime
 
     frameTime = countTime
 
-    def setNImages(n):
+    def setNImages(self, n):
         # dont want to take more than one image with the pilatus trigger now
         pass
 
-    def nImages():
+    def nImages(self):
         return 1
 
-    def version():
-        self.__socket.sendall("version")
-        answer = self.__socket.recv(self.__socketBufferSize)
+    def version(self):
+        self.__socket.sendall("version\n")
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         return answer
 
-    def status():
-        self.__socket.sendall("status")
-        answer = self.__socket.recv(self.__socketBufferSize)
+    def status(self):
+        self.__socket.sendall("status\n")
+        answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         return answer
 
     isError = status
 
-    def trigger():
+    def trigger(self):
         now = datetime.datetime.now().strftime("%y%m%d.%H%M%S%f")
-        fileName = 'dectrisAlbula{0}.cbf'.format(now)
-        self.__socket.sendall("expo {0}\n".format(modeDict[mode], fileName))
-        self.__socketRecv(timeout=None)
+        fileName = 'dectrisAlbula.{0}.cbf'.format(now)
+        logger.debug("exposing for %s", fileName)
+        self.__socket.sendall("expo {0}\n".format(fileName))
+        answer = self.__socketRecv(SOCKET_BUFFER_SIZE)
+        logger.debug(answer)
+        answer = self.__socketRecv(SOCKET_BUFFER_SIZE)
+        logger.debug(answer)
 
-    def arm():
+    def arm(self):
         pass
 
-    def disarm():
+    def disarm(self):
         pass
 
     def __openSocket(self, host, timeout):
         self.__socket = None
-        for addrFam, socketType, proto, canonName, socketAddr in socket.getaddrinfo(host, self.__port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+        for addrFam, socketType, proto, canonName, socketAddr in socket.getaddrinfo(host, self.port, socket.AF_UNSPEC, socket.SOCK_STREAM):
             try:
                 self.__socket = socket.socket(addrFam, socketType, proto)
-            except socket.error, msg:
+            except socket.error as msg:
+                logger.error("socket connection failed %s", msg)
                 self.__socket = None
                 continue
             try:
-                self.__socket.settimeout(0.1)
                 self.__socket.connect(socketAddr)
                 timeWaited = 0
                 while True:
                     self.__socket.sendall("imgmode x\n")
-                    answer = self.__socket.recv(self.__socketBufferSize)
+                    answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
                     if (answer.find("access denied")>=0):
                         if timeWaited < timeout:
                             timeWaited += 1
@@ -174,16 +158,17 @@ class DPilatus(object):
                             return None
                     else:
                         break
-            except socket.error, msg:
+            except socket.error as msg:
+                logger.error("socket connection failed %s", msg)
                 self.__socket.close()
                 self.__socket = None
                 continue
             break
 
-    def __socketRecv(self, timeout = None):
+    def __socketRecv(self, timeout=None):
         self.__socket.settimeout(timeout)
         try:
-            answer = self.__socket.recv(self.__socketBufferSize)
+            answer = self.__socket.recv(SOCKET_BUFFER_SIZE)
         except socket.timeout:
             answer = None
         except Exception as e:
@@ -194,7 +179,7 @@ class DPilatus(object):
         return answer
 
 
-class Pilatus(DPilatus):
+class Pilatus(DPilatusDetector):
 
     def __init__(self,
                  host="129.129.99.81",
@@ -206,26 +191,44 @@ class Pilatus(DPilatus):
         super(Pilatus, self).__init__(host, port)
         self.initialize()
         logger.debug(
-            "pilatus camserver version %s returns status %s",
-            self.version(),
-            self.status()
+            "pilatus camserver version %s",
+            self.version()
         )
-        logger.debug("Set energy to %s eV", photon_energy)
-        self.setPhotonEnergy(photon_energy)
+        logger.debug(self.status())
+        answer = self.setPhotonEnergy(photon_energy)
+        logger.debug("Set energy %s", answer)
 
     def save(self):
-        config = self.stream.pop()
+        now = datetime.datetime.now().strftime("%y%m%d.%H%M%S%f")
         output_file = os.path.join(
             self.storage_path,
-            "series_{0}.h5".format(config["series"])
+            "series.{0}.h5".format(now)
         )
-        logger.debug("saving eiger image to %s ...", output_file)
-        with dectris.albula.DHdf5Writer(output_file, 0) as hdf5_writer:
-            data = self.stream.pop()
-            while data["type"] == "data":
-                hdf5_writer.write(data["data"])
-                data = self.stream.pop()
-        logger.info("pilatus image saved to %s", output_file)
+        logger.debug("saving pilatus image to %s ...", output_file)
+        tempdir = tempfile.mkdtemp()
+        try:
+            logger.debug("created temporary directory %s", tempdir)
+            copy_command = "scp det@{0}:{1}/*.cbf {2}".format(
+                self.host,
+                REMOTE_IMAGE_PATH,
+                tempdir) 
+            logger.debug(copy_command)
+            copied = subprocess.check_output(copy_command, shell=True)
+            logger.debug(copied)
+            removed = subprocess.check_output(
+                "ssh det@{0} 'rm {1}/*.cbf'".format(
+                    self.host,
+                    REMOTE_IMAGE_PATH,
+                    ), shell=True)
+            logger.debug(removed)
+            copied_files = glob.glob("{0}/*.cbf".format(tempdir))
+            with dectris.albula.DHdf5Writer(output_file, 0) as hdf5_writer:
+                for input_file in copied_files:
+                    data = dectris.albula.readImage(input_file)
+                    hdf5_writer.write(data)
+            logger.info("pilatus image saved to %s", output_file)
+        finally:
+            shutil.rmtree(tempdir)
 
     def snap(self, exposure_time=1):
         self.setNImages(1)
