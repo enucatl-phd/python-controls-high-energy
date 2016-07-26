@@ -2,6 +2,8 @@ import dectris.albula
 import os
 import logging
 
+import controls.hdf5
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,7 +40,7 @@ class Eiger(dectris.albula.DEigerDetector):
             "series_{0}.h5".format(config["series"])
         )
         logger.debug("saving eiger image to %s ...", output_file)
-        with dectris.albula.DHdf5Writer(output_file, 0, config["config"]) as hdf5_writer:
+        with controls.hdf5.Hdf5Writer(output_file) as hdf5_writer:
             data = self.stream.pop()
             while data["type"] == "data":
                 hdf5_writer.write(data["data"])

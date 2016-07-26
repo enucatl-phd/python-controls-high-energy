@@ -1,3 +1,5 @@
+import dectris.albula
+
 import socket
 import datetime
 import os
@@ -7,7 +9,7 @@ import glob
 import shutil
 import subprocess
 
-import dectris.albula
+import controls.hdf5
 
 logger = logging.getLogger(__name__)
 
@@ -222,7 +224,7 @@ class Pilatus(DPilatusDetector):
                     ), shell=True)
             logger.debug(removed)
             copied_files = glob.glob("{0}/*.cbf".format(tempdir))
-            with dectris.albula.DHdf5Writer(output_file, 0) as hdf5_writer:
+            with controls.hdf5.Hdf5Writer(output_file) as hdf5_writer:
                 for input_file in copied_files:
                     data = dectris.albula.readImage(input_file)
                     hdf5_writer.write(data)

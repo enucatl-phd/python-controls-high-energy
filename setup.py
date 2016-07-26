@@ -35,6 +35,7 @@ setup(
         'click',
         'ipython',
         'pyepics',
+        'h5py',
         'pyserial',
     ],
     entry_points="""
