@@ -59,10 +59,10 @@ def main(verbose, storage_path, threshold):
         # storage_path=storage_path,
         # photon_energy=threshold
     # )
-    detector = controls.pilatus.Pilatus(
-        "129.129.99.81",
-        storage_path=storage_path,
-        photon_energy=threshold
-    )
+    #detector = controls.pilatus.Pilatus(
+     #   "129.129.99.81",
+      #  storage_path=storage_path,
+       # photon_energy=threshold
+    #)
     tube = controls.comet_tube.CometTube()
     IPython.embed()
