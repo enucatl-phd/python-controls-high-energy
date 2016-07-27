@@ -20,16 +20,18 @@ def dscan(detector, motor, begin, end, intervals, exposure_time=1):
         detector.arm()
         detector.trigger()
         time.sleep(exposure_time)
-        for _ in range(intervals):
+        for i in range(intervals):
             motor.mvr(step)
             logger.info(motor)
-            logger.debug("detector %s count time, %s frame time",
+            logger.debug("snap %d, detector %s count time, %s frame time",
+                i + 1,
                 detector.frameTime(),
                 detector.countTime())
             detector.trigger()
             time.sleep(exposure_time)
         detector.disarm()
         detector.save()
+        
     finally:
         logger.debug("going back to initial motor position %s", initial_motor_position)
         motor.mv(initial_motor_position)

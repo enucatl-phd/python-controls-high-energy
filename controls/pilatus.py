@@ -223,12 +223,13 @@ class Pilatus(DPilatusDetector):
                     REMOTE_IMAGE_PATH,
                     ), shell=True)
             logger.debug(removed)
-            copied_files = glob.glob("{0}/*.cbf".format(tempdir))
+            copied_files = sorted(glob.glob("{0}/*.cbf".format(tempdir)))
             with controls.hdf5.Hdf5Writer(output_file) as hdf5_writer:
                 for input_file in copied_files:
                     data = dectris.albula.readImage(input_file)
                     hdf5_writer.write(data)
             logger.info("pilatus image saved to %s", output_file)
+            logger.debug(datetime.datetime.now().strftime("%H%M%S%f"))
         finally:
             shutil.rmtree(tempdir)
 
