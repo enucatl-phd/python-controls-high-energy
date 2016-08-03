@@ -61,7 +61,7 @@ class Motor():
         self._hlm = self._pv.upper_ctrl_limit  # High limit
         self._llm = self._pv.lower_ctrl_limit  # Low limit
 
-    def mv(self, absolute_position):
+    def mv(self, absolute_position, timeout=9999):
         """ Move motor to absolute position
 
             Input parameters:
@@ -89,9 +89,9 @@ class Motor():
                     self._epics_name, position))
 
         # Set new position and wait (if necessary) for finish
-        self._pv.put(absolute_position, self._wait_for_finish)
+        self._pv.put(absolute_position, self._wait_for_finish, timeout=timeout)
 
-    def mvr(self, relative_position):
+    def mvr(self, relative_position, timeout=9999):
         """ Move motor to relative position
 
             I.e. if current position is 40um, and mvr(20), move to 60um
@@ -122,7 +122,7 @@ class Motor():
                     self._epics_name, position))
 
         # Set new position and wait (if necessary) for finish
-        self._pv.put(absolute_position, self._wait_for_finish)
+        self._pv.put(absolute_position, self._wait_for_finish, timeout=timeout)
 
     # Get current value of motor PV (position)
     def get_current_value(self):
@@ -137,8 +137,7 @@ class Motor():
                 self._val (current)
 
         """
-        self._val = epics.caget(self._epics_name + '.VAL')
-        return self._val
+        return self._pv.get()
 
     # Get high/low limits
     def get_high_limit(self):

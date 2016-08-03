@@ -8,6 +8,7 @@ import tempfile
 import glob
 import shutil
 import subprocess
+import time
 
 import controls.hdf5
 
@@ -201,10 +202,10 @@ class Pilatus(DPilatusDetector):
         logger.debug("Set energy %s", answer)
 
     def save(self):
-        now = datetime.datetime.now().strftime("%y%m%d.%H%M%S%f")
+        now = datetime.datetime.now()
         output_file = os.path.join(
             self.storage_path,
-            "series.{0}.h5".format(now)
+            "series.{0}.h5".format(now.strftime("%y%m%d.%H%M%S%f"))
         )
         logger.debug("saving pilatus image to %s ...", output_file)
         tempdir = tempfile.mkdtemp()
@@ -229,7 +230,7 @@ class Pilatus(DPilatusDetector):
                     data = dectris.albula.readImage(input_file)
                     hdf5_writer.write(data)
             logger.info("pilatus image saved to %s", output_file)
-            logger.debug(datetime.datetime.now().strftime("%H%M%S%f"))
+            logger.debug(now.strftime("%H%M%S%f"))
         finally:
             shutil.rmtree(tempdir)
 
