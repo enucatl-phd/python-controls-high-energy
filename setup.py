@@ -37,6 +37,7 @@ setup(
         'pyepics',
         'h5py',
         'pyserial',
+        'requests',
     ],
     entry_points="""
     [console_scripts]

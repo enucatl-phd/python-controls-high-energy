@@ -54,15 +54,15 @@ def main(verbose, storage_path, threshold):
     smpltry = controls.motors.Motor("X02DA-BNK-HE:SMPL_TRY", "smpltry")
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
-    # detector = controls.eiger.Eiger(
-        # "129.129.99.99",
-        # storage_path=storage_path,
-        # photon_energy=threshold
-    # )
-    detector = controls.pilatus.Pilatus(
-       "129.129.99.81",
-       storage_path=storage_path,
-       photon_energy=threshold
+    detector = controls.eiger.Eiger(
+        "129.129.99.81",
+        storage_path=storage_path,
+        photon_energy=threshold
     )
+    # detector = controls.pilatus.Pilatus(
+     #   "129.129.99.81",
+      #  storage_path=storage_path,
+       # photon_energy=threshold
+    # )
     tube = controls.comet_tube.CometTube()
     IPython.embed()
