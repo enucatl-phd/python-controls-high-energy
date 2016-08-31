@@ -98,7 +98,6 @@ class DPilatusDetector(object):
         return answer
 
     setFrameTime = setCountTime
-
     frameTime = countTime
 
     def setNImages(self, n):
@@ -120,7 +119,8 @@ class DPilatusDetector(object):
 
     isError = status
 
-    def trigger(self):
+    def trigger(self, exposure_time=1):
+        self.setCountTime(exposure_time)
         now = datetime.datetime.now().strftime("%y%m%d.%H%M%S%f")
         fileName = 'dectrisAlbula.{0}.cbf'.format(now)
         logger.debug("exposing for %s", fileName)

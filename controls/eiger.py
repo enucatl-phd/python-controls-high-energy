@@ -49,8 +49,8 @@ class Eiger(dectris.albula.DEigerDetector):
                 path,
                 )
         headers = {'Content-Type': 'application/json'}
-        response = requests.put(url, json.dumps(dictionary), headers=headers)
         logger.debug("sent %s", dictionary)
+        response = requests.put(url, json.dumps(dictionary), headers=headers)
         logger.debug("got response %s %s", response.status_code, response.json())
         return response.json()
 
