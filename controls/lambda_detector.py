@@ -78,10 +78,9 @@ class Lambda(object):
         folder_name = os.path.join(
             self.storage_path,
             now.strftime("%H%M%S%f"))
-        subprocess.check_call(
-            "ssh e14980@x02da-gws-1 'mkdir {0}'".format(folder_name),
-            shell=True)
-        subprocess.check_call("scp {0}/*.nxs e14980@x02da-gws-1:{1}".format(
+        os.makedirs(folder_name)
+        subprocess.check_call("scp lambda@{0}:{1}/*.nxs {2}".format(
+            self.host,
             self.device.SaveFilePath,
             folder_name), shell=True)
         subprocess.check_call("rm {0}/*.nxs".format(
