@@ -1,6 +1,5 @@
 from __future__ import division
 
-import dectris.albula
 import logging
 import os
 import time

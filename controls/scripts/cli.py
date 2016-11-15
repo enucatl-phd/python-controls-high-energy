@@ -15,17 +15,15 @@ import logging.config
 import logging
 
 import controls.motors
-import controls.eiger
-import controls.pilatus
-import controls.comet_tube
 import controls.scans
 import controls.log_config
+import controls.lambda_detector
 
 @click.command()
 @click.option("-v", "--verbose", count=True)
 @click.option("-s", "--storage_path",
     default="/afs/psi.ch/project/hedpc/raw_data/2016/pilatus/2016.07.19",
-    type=click.Path(exists=True))
+    type=click.Path())
 @click.option("-t", "--threshold",
     default=10000,
     help="detector threshold energy (eV)")
@@ -54,15 +52,7 @@ def main(verbose, storage_path, threshold):
     smpltry = controls.motors.Motor("X02DA-BNK-HE:SMPL_TRY", "smpltry")
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
-    detector = controls.eiger.Eiger(
-        "129.129.99.81",
-        storage_path=storage_path,
-        photon_energy=threshold
-    )
-    # detector = controls.pilatus.Pilatus(
-     #   "129.129.99.81",
-      #  storage_path=storage_path,
-       # photon_energy=threshold
-    # )
-    tube = controls.comet_tube.CometTube()
+    detector = controls.lambda_detector.Lambda(
+        photon_energy=threshold,
+        storage_path=storage_path)
     IPython.embed()
