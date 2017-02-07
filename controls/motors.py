@@ -58,8 +58,6 @@ class Motor():
         self._pv = epics.PV(self._epics_name + ".VAL")  # To set/get parameters
 
         self._val = self._pv.get()  # Current PV value
-        self._hlm = self._pv.upper_ctrl_limit  # High limit
-        self._llm = self._pv.lower_ctrl_limit  # Low limit
 
     def mv(self, absolute_position, timeout=9999):
         """ Move motor to absolute position
@@ -77,13 +75,14 @@ class Motor():
                      self._epics_name,
                      absolute_position)
         if self._motor_disabled:
-            raise MotorInterrupt(
+            raise controls.exceptions.MotorInterrupt(
                 "Motor [{0}] is disabled".format(self._epics_name)
             )
 
         # Check validity of absolute position
-        if absolute_position > self._hlm or absolute_position < self._llm:
-            raise MotorInterrupt(
+        if (absolute_position > self._pv.upper_ctrl_limit
+            or absolute_position < self._pv.lower_ctrl_limit):
+            raise controls.exceptions.MotorInterrupt(
                 "Moving motor [{0}] to position\
                 [{1}] failed: position out of range.".format(
                     self._epics_name, position))
@@ -109,13 +108,14 @@ class Motor():
                      self._epics_name,
                      relative_position)
         if self._motor_disabled:
-            raise MotorInterrupt("Motor [{0}] is disabled"
+            raise controls.exceptions.MotorInterrupt("Motor [{0}] is disabled"
                                  .format(self._epics_name))
 
         # Calculate absolute position
         absolute_position = self.get_current_value() + relative_position
         # Check validity of absolute position
-        if absolute_position > self._hlm or absolute_position < self._llm:
+        if (absolute_position > self._pv.upper_ctrl_limit
+            or absolute_position < self._pv.lower_ctrl_limit):
             raise MotorInterrupt(
                 "Moving motor [{0}] to position\
                 [{1}] failed: position out of range.".format(
@@ -152,7 +152,7 @@ class Motor():
                 self._hlm
 
         """
-        return self._hlm
+        return self._pv.upper_ctrl_limit
 
     def get_low_limit(self):
         """ Return the motors low limit value
@@ -166,7 +166,7 @@ class Motor():
                 self._llm
 
         """
-        return self._llm
+        return self._pv.lower_ctrl_limit
 
     # Print Info of single motor
     def __str__(self):
