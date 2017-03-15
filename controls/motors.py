@@ -85,7 +85,7 @@ class Motor():
             raise controls.exceptions.MotorInterrupt(
                 "Moving motor [{0}] to position\
                 [{1}] failed: position out of range.".format(
-                    self._epics_name, position))
+                    self._epics_name, absolute_position))
 
         # Set new position and wait (if necessary) for finish
         self._pv.put(absolute_position, self._wait_for_finish, timeout=timeout)
@@ -116,10 +116,10 @@ class Motor():
         # Check validity of absolute position
         if (absolute_position > self._pv.upper_ctrl_limit
             or absolute_position < self._pv.lower_ctrl_limit):
-            raise MotorInterrupt(
+            raise controls.exceptions.MotorInterrupt(
                 "Moving motor [{0}] to position\
                 [{1}] failed: position out of range.".format(
-                    self._epics_name, position))
+                    self._epics_name, absolute_position))
 
         # Set new position and wait (if necessary) for finish
         self._pv.put(absolute_position, self._wait_for_finish, timeout=timeout)
