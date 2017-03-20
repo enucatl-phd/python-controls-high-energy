@@ -20,10 +20,11 @@ class Titlis(object):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
         subprocess.check_call(
-            "ssh det@{0} 'python ~/python-controls-high-energy/controls/titlis-server.py'".format(
-            host))
+            "ssh det@{0} 'python ~/python-controls-high-energy/controls/titlis_server.py &'".format(
+            host), shell=True)
         self.socket.connect("tcp://{0}:{1}".format(
             host, port))
+        self.setThresholds(photon_energy)
 
     def send_command(self, method, kwargs):
         dictionary = {
@@ -35,6 +36,8 @@ class Titlis(object):
         logger.debug("got response %s", message)
         return message
 
+    def setThresholds(self, thresholds):
+        return self.send_command("setTresholds", {"thresholds": thresholds})
 
 if __name__ == "__main__":
     detector = Titlis("129.129.99.119")
