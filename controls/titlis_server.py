@@ -7,8 +7,10 @@ import pickle
 import sys
 import time
 import zmq
+import logging
 
-# Image Destination
+logger = logging.getLogger(__name__)
+
 
 class TitlisServer(object):
 
@@ -132,6 +134,9 @@ class TitlisServer(object):
                 self.socket.send_pyobj({
                     "status": 500,
                     "value": e.message})
+
+    def echo(self, value):
+        return value
 
 
 if __name__ == "__main__":

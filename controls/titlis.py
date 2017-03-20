@@ -1,5 +1,8 @@
 import zmq
 import subprocess
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Titlis(object):
@@ -31,3 +34,9 @@ class Titlis(object):
         message = self.socket.recv_pyobj()
         logger.debug("got response %s", message)
         return message
+
+
+if __name__ == "__main__":
+    detector = Titlis("129.129.99.119")
+    message = detector.send_command("echo", {"value": "test"})
+    print(message)
