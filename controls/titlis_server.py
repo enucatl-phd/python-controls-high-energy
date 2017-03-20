@@ -3,11 +3,11 @@ import dectris.spluegen
 import dectris.albula
 import os
 import numpy
-import pickle
-import sys
 import time
 import zmq
 import logging
+import glob
+from PIL import image
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,6 @@ class TitlisServer(object):
             sequence_period=1.02 * exposure_time,
             frame_count_time=1.01 * exposure_time)
         self.detector.sendSoftwareTriggerPulse()
-        time.sleep(exposure_time)
         saved = self.image_builder.waitImageIsSaved()
         return saved
 
@@ -108,6 +107,27 @@ class TitlisServer(object):
             80000, # fudge useless value
             threshold=thresholds[0],
             threshold2=thresholds[1])
+
+    def save_hdf5(self):
+        output_file_name = self.image_destination_path + ".h5"
+        output_file = h5py.File(output_file_name)
+        groups = ["th0", "th1"]
+        for group_name in group:
+            group = output_file.require_group("/entry/data/{0}".format(group_name))
+            group_files = glob.glob(
+                os.path.join(
+                    self.image_destination_path,
+                    "*{0}*.tif".format(group_name)))
+            for i, group_file in enumerate(group_files):
+                dataset = np.array(Image.open(group_file))
+                group.create_dataset(
+                    "data_{0:06d}".format(i + 1),
+                    data=dataset)
+                os.remove(group_file)
+        output_file.close()
+        logger.debug("created %s file", output_file_name)
+        return os.path.abspath(output_file_name)
+
 
 
 if __name__ == "__main__":
