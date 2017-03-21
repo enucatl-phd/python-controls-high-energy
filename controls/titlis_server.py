@@ -2,6 +2,7 @@ import dectris
 import dectris.spluegen
 import dectris.albula
 import os
+import time
 import numpy as np
 import datetime
 import zmq
@@ -67,7 +68,7 @@ class TitlisServer(object):
         return n
 
     def trigger(self, exposure_time=1):
-        logger.debug("setting exposure parameters")
+        logger.debug("setting exposure parameters %s", exposure_time)
         self.detector.setExposureParameters(
             count_time=exposure_time,
             image_period=1.01 * exposure_time,
@@ -75,7 +76,9 @@ class TitlisServer(object):
             frame_count_time=1.01 * exposure_time)
         logger.debug("sending trigger pulse")
         self.detector.sendSoftwareTriggerPulse()
-        logger.debug("saving image")
+        while self.detector.exposureIsActive():
+            time.sleep(0.1)
+        logger.debug("exposure finished")
         saved = self.image_builder.waitImageIsSaved()
         logger.debug("image saved")
         return saved
