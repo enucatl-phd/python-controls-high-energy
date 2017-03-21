@@ -67,13 +67,17 @@ class TitlisServer(object):
         return n
 
     def trigger(self, exposure_time=1):
+        logger.debug("setting exposure parameters")
         self.detector.setExposureParameters(
             count_time=exposure_time,
             image_period=1.01 * exposure_time,
             sequence_period=1.02 * exposure_time,
             frame_count_time=1.01 * exposure_time)
+        logger.debug("sending trigger pulse")
         self.detector.sendSoftwareTriggerPulse()
+        logger.debug("saving image")
         saved = self.image_builder.waitImageIsSaved()
+        logger.debug("image saved")
         return saved
 
     def loop(self):
