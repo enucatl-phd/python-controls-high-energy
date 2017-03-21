@@ -27,20 +27,26 @@ class Titlis(object):
         self.storage_path = storage_path
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        subprocess.check_call(
-            "ssh det@{0} 'python ~/python-controls-high-energy/controls/titlis_server.py &'".format(
-            host), shell=True)
+        self.socket.setsockopt(zmq.LINGER, 2000)
+        self.socket.setsockopt(zmq.RCVTIMEO, 5000)
         self.socket.connect("tcp://{0}:{1}".format(
             host, port))
-        self.add_delegated_methods()
+        logger.debug("test message...")
+        # test that the connection works
+        try:
+            message = self.send_command("echo", "test")
+        except zmq.error.Again as e:
+            logger.error("could not connect to server, please run titlis_server.py on the dectris machine")
+            raise e
+        for method_name in self.delegated_methods:
+            self.add_delegated_method(method_name)
         self.setThresholds(photon_energy)
 
-    def add_delegated_methods(self):
-        for method_name in self.delegated_methods:
-            def method(self, *args, **kwargs):
-                return self.send_command(method_name, *args, **kwargs)
-            method.__name__ = method_name
-            setattr(self.__class__, method_name, method)
+    def add_delegated_method(self, method_name):
+        def method(self, *args, **kwargs):
+            return self.send_command(method_name, *args, **kwargs)
+        method.__name__ = method_name
+        setattr(self.__class__, method_name, method)
 
     def send_command(self, method, *args, **kwargs):
         dictionary = {
@@ -57,8 +63,7 @@ class Titlis(object):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    print(dir(Titlis))
     detector = Titlis("129.129.99.119")
+    logger.debug("created")
     message = detector.send_command("echo", "test")
-    print(message)
-    detector.send_command("__exit__")
+    logger.debug("received echo %s", message)
