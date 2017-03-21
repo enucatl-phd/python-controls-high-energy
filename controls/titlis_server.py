@@ -20,23 +20,23 @@ class TitlisServer(object):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.socket.bind("tcp://*:5555")
-        self.file_name_template = "titlis_ev_{event_id}_seq_{sequence_id}_th_{threshold_id}_im_{image_id}"
+        file_name_template = "titlis_ev_{event_id}_seq_{sequence_id}_th_{threshold_id}_im_{image_id}"
         file_name_template_suffix = "tif"
+        self.number_of_thresholds = 2
 
         # # Detector Calibration File
         calibration_path = "/home/det/calibration/calibration-T0804_75-01_20170314_14h29m22/"
 
         # Detector Configuration File
-        self.configuration_file = "/etc/dectris/titlis-75um_500k-MatH.py"
+        configuration_file = "/etc/dectris/titlis-75um_500k-MatH.py"
 
         # Create Spluegen Camera Object
         self.camera = dectris.spluegen.DCamera(
             "10.0.10.50",
             configuration_file=configuration_file
         )
-        self.setNTrigger(1)
         self.camera.open()
-        self.camera.setNumberOfThresholds(number_of_thresholds)
+        self.camera.setNumberOfThresholds(self.number_of_thresholds)
         self.camera.setCalibrationPath(calibration_path)
 
         # Fetch the Detector and Logger Objects
@@ -44,6 +44,7 @@ class TitlisServer(object):
         self.image_builder = self.camera._image_builder
         self.image_builder._file_name_template = file_name_template
         self.image_builder._file_name_suffix = "tif"
+        self.setNTrigger(1)
 
     def setNTrigger(self, n):
         self.n_trigger = n
@@ -52,7 +53,7 @@ class TitlisServer(object):
             series_id=1,
             number_of_triggers=n,
             number_of_images=1,
-            number_of_thresholds=2)
+            number_of_thresholds=self.number_of_thresholds)
         # Set the Image Destination and the File Name Template
         basepath = "/data/slow_acquisition/"
         self.image_destination_path = os.path.join(
@@ -77,7 +78,11 @@ class TitlisServer(object):
         while True:
             message = self.socket.recv_pyobj()
             method_name = message["method"]
-            if method_name == "__exit__": break
+            if method_name == "__exit__":
+                self.socket.send_pyobj({
+                    "status": 200,
+                    "value": "received __exit__ command, stopping server"})
+                break
             args = message["args"]
             kwargs = message["kwargs"]
             logger.debug("received %s", method_name)
@@ -114,7 +119,7 @@ class TitlisServer(object):
     def save(self):
         output_file_name = self.image_destination_path + ".h5"
         output_file = h5py.File(output_file_name)
-        groups = ["th0", "th1"]
+        groups = ["th_0", "th_1"]
         for group_name in group:
             group = output_file.require_group("/entry/data/{0}".format(group_name))
             group_files = glob.glob(
@@ -134,7 +139,7 @@ class TitlisServer(object):
 
 
 if __name__ == "__main__":
-    LOG_FILENAME = 'example.log'
+    LOG_FILENAME = '/home/det/example.log'
     FORMAT = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
     logging.basicConfig(
         format=FORMAT,
