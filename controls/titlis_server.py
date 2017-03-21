@@ -141,13 +141,8 @@ class TitlisServer(object):
 
 
 if __name__ == "__main__":
-    LOG_FILENAME = '/home/det/example.log'
-    FORMAT = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-    logging.basicConfig(
-        format=FORMAT,
-        filename=LOG_FILENAME,
-        level=logging.DEBUG,
-    )
+    import logging.config
+    logging.config.dictConfig(controls.log_config.get_dict(2))
     logger.debug("starting server")
     server = TitlisServer()
     logger.debug("starting loop")
