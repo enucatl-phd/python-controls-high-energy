@@ -1,6 +1,7 @@
 import zmq
 import subprocess
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ class Titlis(object):
             "args": args,
             "kwargs": kwargs,
         }
-        logger.debug("sending dict %s", dictionary)
+        logger.debug("sending %s", dictionary)
         self.socket.send_pyobj(dictionary)
         message = self.socket.recv_pyobj()
         logger.debug("got response %s", message)
@@ -70,6 +71,12 @@ class Titlis(object):
             remote_file_name,
             self.storage_path
         ), shell=True)
+        logger.debug("saved file %s",
+            os.path.join(self.storage_path,
+                         os.path.basename(remote_file_name)))
+        subprocess.check_call("ssh det@{0} 'rm {1}'".format(
+            self.host,
+            remote_file_name), shell=True)
 
     def snap(self, exposure_time=1):
         self.setNTrigger(1)

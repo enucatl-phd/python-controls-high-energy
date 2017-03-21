@@ -16,18 +16,15 @@ def dscan(detector, motor, begin, end, intervals, exposure_time=1):
         motor.mvr(begin)
         step = (end - begin) / intervals
         detector.setNTrigger(intervals + 1)
-        detector.setFrameTime(exposure_time + 0.000020)
-        detector.setCountTime(exposure_time)
         detector.arm()
         detector.trigger(exposure_time)
         for i in range(intervals):
             motor.mvr(step)
             time.sleep(0.1)
             logger.info(motor)
-            logger.debug("snap %d, detector %s count time, %s frame time",
+            logger.debug("snap %d, exposure time %s",
                 i + 1,
-                detector.countTime(),
-                detector.frameTime(),
+                exposure_time
                 )
             detector.trigger(exposure_time)
         detector.disarm()
@@ -49,8 +46,6 @@ def phase_stepping_scan(
                  initial_phase_stepping_position)
     try:
         detector.setNTrigger((intervals + 1) * phase_steps)
-        detector.setFrameTime(exposure_time + 0.000020)
-        detector.setCountTime(exposure_time)
         detector.arm()
         motor_positions = np.linspace(begin, end, intervals + 1)
         phase_stepping_positions = np.linspace(
@@ -67,10 +62,9 @@ def phase_stepping_scan(
                 phase_stepping_motor.mv(
                     initial_phase_stepping_position + phase_stepping_position)
                 detector.trigger(exposure_time)
-                logger.debug("step %d, detector %s count time, %s frame time",
+                logger.debug("step %d, exposure_time %s",
                     i + 1,
-                    detector.countTime(),
-                    detector.frameTime(),
+                    exposure_time,
                     )
                 logger.debug(phase_stepping_motor)
         detector.disarm()
