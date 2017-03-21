@@ -7,7 +7,7 @@ import time
 import zmq
 import logging
 import glob
-from PIL import image
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
