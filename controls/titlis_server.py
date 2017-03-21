@@ -40,8 +40,8 @@ class TitlisServer(object):
         self.camera.setCalibrationPath(calibration_path)
 
         # Fetch the Detector and Logger Objects
-        self.detector = camera.getDetectorObject()
-        self.image_builder = camera._image_builder
+        self.detector = self.camera.getDetectorObject()
+        self.image_builder = self.camera._image_builder
         self.image_builder._file_name_template = file_name_template
         self.image_builder._file_name_suffix = "tif"
 
@@ -135,7 +135,12 @@ class TitlisServer(object):
 
 if __name__ == "__main__":
     LOG_FILENAME = 'example.log'
-    logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+    FORMAT = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+    logging.basicConfig(
+        format=FORMAT,
+        filename=LOG_FILENAME,
+        level=logging.DEBUG,
+    )
     logger.debug("starting server")
     server = TitlisServer()
     logger.debug("starting loop")
