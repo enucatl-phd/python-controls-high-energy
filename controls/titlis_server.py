@@ -136,5 +136,7 @@ class TitlisServer(object):
 if __name__ == "__main__":
     LOG_FILENAME = 'example.log'
     logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+    logger.debug("starting server")
     server = TitlisServer()
+    logger.debug("starting loop")
     server.loop()
