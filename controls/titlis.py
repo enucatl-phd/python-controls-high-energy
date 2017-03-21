@@ -27,8 +27,8 @@ class Titlis(object):
         self.storage_path = storage_path
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
-        self.socket.setsockopt(zmq.LINGER, 2000)
-        self.socket.setsockopt(zmq.RCVTIMEO, 5000)
+        self.socket.setsockopt(zmq.LINGER, 10000)
+        self.socket.setsockopt(zmq.RCVTIMEO, 10000)
         self.socket.connect("tcp://{0}:{1}".format(
             host, port))
         logger.debug("test message...")
@@ -38,6 +38,8 @@ class Titlis(object):
         except zmq.error.Again as e:
             logger.error("could not connect to server, please run titlis_server.py on the dectris machine")
             raise e
+        self.socket.setsockopt(zmq.LINGER, -1)
+        self.socket.setsockopt(zmq.RCVTIMEO, -1)
         for method_name in self.delegated_methods:
             self.add_delegated_method(method_name)
         self.setThresholds(photon_energy)
@@ -60,6 +62,22 @@ class Titlis(object):
         logger.debug("got response %s", message)
         return message
 
+    def save(self):
+        remote_file_name = self.send_command("save")["value"]
+        logger.debug("remote file name %s", remote_file_name)
+        subprocess.check_call("scp det@{0}:{1} {2}".format(
+            self.host,
+            remote_file_name,
+            self.storage_path
+        ), shell=True)
+
+    def snap(self, exposure_time=1):
+        self.setNTrigger(1)
+        self.arm()
+        self.trigger(exposure_time)
+        self.disarm()
+        self.save()
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
@@ -67,3 +85,4 @@ if __name__ == "__main__":
     logger.debug("created")
     message = detector.send_command("echo", "test")
     logger.debug("received echo %s", message)
+    detector.snap()
