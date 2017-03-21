@@ -109,8 +109,7 @@ class TitlisServer(object):
     def disarm(self):
         return self.detector.disarmSeries()
 
-    def setTresholds(thresholds):
-        assert len(thresholds) == 2
+    def setThresholds(self, thresholds):
         return self.camera.setEnergyForReal(
             80000, # fudge useless value
             threshold=thresholds[0],
