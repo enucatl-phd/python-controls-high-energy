@@ -2,12 +2,13 @@ import dectris
 import dectris.spluegen
 import dectris.albula
 import os
-import numpy
-import time
+import numpy as np
+import datetime
 import zmq
 import logging
 import glob
-from PIL import Image
+import h5py
+from libtiff import TIFF
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +57,10 @@ class TitlisServer(object):
             number_of_thresholds=self.number_of_thresholds)
         # Set the Image Destination and the File Name Template
         basepath = "/data/slow_acquisition/"
+        now = datetime.datetime.now()
         self.image_destination_path = os.path.join(
             basepath,
-            time.strftime("%y%m%d.%H%M%S%f"))
+            now.strftime("%y%m%d.%H%M%S%f"))
         if not os.path.exists(self.image_destination_path):
             os.makedirs(self.image_destination_path)
         self.image_builder.setSaveDirectory(self.image_destination_path)
@@ -103,7 +105,6 @@ class TitlisServer(object):
 
     def arm(self):
         value = self.detector.arm("ints")
-        time.sleep(1)
         return value
 
     def disarm(self):
@@ -119,14 +120,16 @@ class TitlisServer(object):
         output_file_name = self.image_destination_path + ".h5"
         output_file = h5py.File(output_file_name)
         groups = ["th_0", "th_1"]
-        for group_name in group:
+        for group_name in groups:
             group = output_file.require_group("/entry/data/{0}".format(group_name))
             group_files = glob.glob(
                 os.path.join(
                     self.image_destination_path,
                     "*{0}*.tif".format(group_name)))
             for i, group_file in enumerate(group_files):
-                dataset = np.array(Image.open(group_file))
+                logger.debug("trying to read %s", group_file)
+                tif = TIFF.open(group_file, mode="r")
+                dataset = tif.read_image()
                 group.create_dataset(
                     "data_{0:06d}".format(i + 1),
                     data=dataset)
@@ -145,5 +148,7 @@ if __name__ == "__main__":
         filename=LOG_FILENAME,
         level=logging.DEBUG,
     )
+    logger.debug("starting server")
     server = TitlisServer()
+    logger.debug("starting loop")
     server.loop()
