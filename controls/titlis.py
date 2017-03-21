@@ -7,6 +7,14 @@ logger = logging.getLogger(__name__)
 
 class Titlis(object):
 
+    delegated_methods = [
+        "setThresholds",
+        "arm",
+        "disarm",
+        "trigger",
+        "setNTrigger",
+    ]
+
     def __init__(
             self,
             host,
@@ -24,22 +32,33 @@ class Titlis(object):
             host), shell=True)
         self.socket.connect("tcp://{0}:{1}".format(
             host, port))
+        self.add_delegated_methods()
         self.setThresholds(photon_energy)
 
-    def send_command(self, method, kwargs):
+    def add_delegated_methods(self):
+        for method_name in self.delegated_methods:
+            def method(self, *args, **kwargs):
+                return self.send_command(method_name, *args, **kwargs)
+            method.__name__ = method_name
+            setattr(self.__class__, method_name, method)
+
+    def send_command(self, method, *args, **kwargs):
         dictionary = {
             "method": method,
-            "kwargs": kwargs
+            "args": args,
+            "kwargs": kwargs,
         }
+        logger.debug("sending dict %s", dictionary)
         self.socket.send_pyobj(dictionary)
         message = self.socket.recv_pyobj()
         logger.debug("got response %s", message)
         return message
 
-    def setThresholds(self, thresholds):
-        return self.send_command("setTresholds", {"thresholds": thresholds})
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    print(dir(Titlis))
     detector = Titlis("129.129.99.119")
-    message = detector.send_command("echo", {"value": "test"})
+    message = detector.send_command("echo", "test")
     print(message)
+    detector.send_command("__exit__")

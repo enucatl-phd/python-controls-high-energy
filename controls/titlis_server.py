@@ -57,7 +57,7 @@ class TitlisServer(object):
         basepath = "/data/slow_acquisition/"
         self.image_destination_path = os.path.join(
             basepath,
-            time.strftime("%y%m%d_%H%M%S"))
+            time.strftime("%y%m%d.%H%M%S%f"))
         if not os.path.exists(self.image_destination_path):
             os.makedirs(self.image_destination_path)
         self.image_builder.setSaveDirectory(self.image_destination_path)
@@ -77,11 +77,13 @@ class TitlisServer(object):
         while True:
             message = self.socket.recv_pyobj()
             method_name = message["method"]
+            if method_name == "__exit__": break
+            args = message["args"]
             kwargs = message["kwargs"]
             print(method_name)
             print(kwargs)
             try:
-                value = getattr(self, method_name)(**kwargs)
+                value = getattr(self, method_name)(*args, **kwargs)
                 self.socket.send_pyobj({
                     "status": 200,
                     "value": value})
@@ -108,7 +110,7 @@ class TitlisServer(object):
             threshold=thresholds[0],
             threshold2=thresholds[1])
 
-    def save_hdf5(self):
+    def save(self):
         output_file_name = self.image_destination_path + ".h5"
         output_file = h5py.File(output_file_name)
         groups = ["th0", "th1"]
@@ -131,5 +133,7 @@ class TitlisServer(object):
 
 
 if __name__ == "__main__":
+    LOG_FILENAME = 'example.log'
+    logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
     server = TitlisServer()
     server.loop()
