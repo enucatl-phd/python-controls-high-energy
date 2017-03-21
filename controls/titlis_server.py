@@ -78,7 +78,11 @@ class TitlisServer(object):
         while True:
             message = self.socket.recv_pyobj()
             method_name = message["method"]
-            if method_name == "__exit__": break
+            if method_name == "__exit__":
+                self.socket.send_pyobj({
+                    "status": 200,
+                    "value": "received __exit__ command, stopping server"})
+                break
             args = message["args"]
             kwargs = message["kwargs"]
             logger.debug("received %s", method_name)
@@ -135,7 +139,7 @@ class TitlisServer(object):
 
 
 if __name__ == "__main__":
-    LOG_FILENAME = 'example.log'
+    LOG_FILENAME = '/home/det/example.log'
     FORMAT = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
     logging.basicConfig(
         format=FORMAT,
