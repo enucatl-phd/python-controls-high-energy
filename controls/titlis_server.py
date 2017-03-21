@@ -80,8 +80,9 @@ class TitlisServer(object):
             if method_name == "__exit__": break
             args = message["args"]
             kwargs = message["kwargs"]
-            print(method_name)
-            print(kwargs)
+            logger.debug("received %s", method_name)
+            logger.debug("args %s", args)
+            logger.debug("kwargs %s", kwargs)
             try:
                 value = getattr(self, method_name)(*args, **kwargs)
                 self.socket.send_pyobj({
