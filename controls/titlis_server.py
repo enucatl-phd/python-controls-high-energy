@@ -67,21 +67,20 @@ class TitlisServer(object):
         self.image_builder.setSaveDirectory(self.image_destination_path)
         return n
 
-    def trigger(self, exposure_time=1):
+    def setExposureParameters(self, exposure_time=1):
         logger.debug("setting exposure parameters %s", exposure_time)
         self.detector.setExposureParameters(
             count_time=exposure_time,
             image_period=1.01 * exposure_time,
             sequence_period=1.02 * exposure_time,
             frame_count_time=1.01 * exposure_time)
+
+    def trigger(self, exposure_time=1):
         logger.debug("sending trigger pulse")
         self.detector.sendSoftwareTriggerPulse()
         while self.detector.exposureIsActive():
             time.sleep(0.1)
         logger.debug("exposure finished")
-        saved = self.image_builder.waitImageIsSaved()
-        logger.debug("image saved")
-        return saved
 
     def loop(self):
         while True:
@@ -124,15 +123,17 @@ class TitlisServer(object):
             threshold2=thresholds[1])
 
     def save(self):
+        self.image_builder.waitSeriesIsSaved()
+        logger.debug("image saved")
         output_file_name = self.image_destination_path + ".h5"
         output_file = h5py.File(output_file_name)
         groups = ["th_0", "th_1"]
         for group_name in groups:
             group = output_file.require_group("/entry/data/{0}".format(group_name))
-            group_files = glob.glob(
+            group_files = sorted(glob.glob(
                 os.path.join(
                     self.image_destination_path,
-                    "*{0}*.tif".format(group_name)))
+                    "*{0}*.tif".format(group_name))))
             for i, group_file in enumerate(group_files):
                 logger.debug("trying to read %s", group_file)
                 tif = TIFF.open(group_file, mode="r")
