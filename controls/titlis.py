@@ -14,6 +14,7 @@ class Titlis(object):
         "disarm",
         "trigger",
         "setNTrigger",
+        "setExposureParameters",
     ]
 
     def __init__(
@@ -80,6 +81,7 @@ class Titlis(object):
 
     def snap(self, exposure_time=1):
         self.setNTrigger(1)
+        self.setExposureParameters(exposure_time)
         self.arm()
         self.trigger(exposure_time)
         self.disarm()

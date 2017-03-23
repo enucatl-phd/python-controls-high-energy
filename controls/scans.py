@@ -16,6 +16,11 @@ def dscan(detector, motor, begin, end, intervals, exposure_time=1):
         motor.mvr(begin)
         step = (end - begin) / intervals
         detector.setNTrigger(intervals + 1)
+        try:
+            # needed for Titlis
+            detector.setExposureParameters(exposure_time)
+        except AttributeError:
+            pass
         detector.arm()
         detector.trigger(exposure_time)
         for i in range(intervals):
@@ -46,6 +51,11 @@ def phase_stepping_scan(
                  initial_phase_stepping_position)
     try:
         detector.setNTrigger((intervals + 1) * phase_steps)
+        try:
+            # needed for Titlis
+            detector.setExposureParameters(exposure_time)
+        except AttributeError:
+            pass
         detector.arm()
         motor_positions = np.linspace(begin, end, intervals + 1)
         phase_stepping_positions = np.linspace(
