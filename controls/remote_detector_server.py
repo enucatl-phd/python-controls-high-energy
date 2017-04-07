@@ -123,7 +123,8 @@ class RemoteDetectorServer(object):
             threshold2=thresholds[1])
 
     def save(self):
-        self.image_builder.waitSeriesIsSaved()
+        for _ in range(self.n_trigger):
+            self.image_builder.waitImageIsSaved()
         logger.debug("image saved")
         output_file_name = self.image_destination_path + ".h5"
         output_file = h5py.File(output_file_name)
@@ -151,8 +152,15 @@ class RemoteDetectorServer(object):
 if __name__ == "__main__":
     import logging.config
     import controls.log_config
-    logging.config.dictConfig(controls.log_config.get_dict(2))
-    logger.debug("starting server")
-    server = RemoteDetectorServer()
-    logger.debug("starting loop")
-    server.loop()
+    import click
+
+    @click.command()
+    @click.option("-v", "--verbose", count=True)
+    def main(verbose):
+        logging.config.dictConfig(controls.log_config.get_dict(verbose))
+        logger.debug("starting server")
+        server = RemoteDetectorServer()
+        logger.debug("starting loop")
+        server.loop()
+
+    main()
