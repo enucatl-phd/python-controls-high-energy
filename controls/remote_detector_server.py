@@ -14,9 +14,9 @@ from libtiff import TIFF
 logger = logging.getLogger(__name__)
 
 
-class TitlisServer(object):
+class RemoteDetectorServer(object):
 
-    """zmq REP server to remotely control the titlis detector."""
+    """zmq REP server to remotely control the remoteDetector detector."""
 
     def __init__(self):
         self.context = zmq.Context()
@@ -153,6 +153,6 @@ if __name__ == "__main__":
     import controls.log_config
     logging.config.dictConfig(controls.log_config.get_dict(2))
     logger.debug("starting server")
-    server = TitlisServer()
+    server = RemoteDetectorServer()
     logger.debug("starting loop")
     server.loop()

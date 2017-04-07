@@ -6,7 +6,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class Titlis(object):
+class RemoteDetector(object):
 
     delegated_methods = [
         "setThresholds",
@@ -23,7 +23,7 @@ class Titlis(object):
             port=5555,
             photon_energy=[10000, 40000],
             storage_path="."):
-        super(Titlis, self).__init__()
+        super(RemoteDetector, self).__init__()
         self.host = host
         self.port = port
         self.storage_path = storage_path
@@ -38,7 +38,8 @@ class Titlis(object):
         try:
             message = self.send_command("echo", "test")
         except zmq.error.Again as e:
-            logger.error("could not connect to server, please run titlis_server.py on the dectris machine")
+            logger.error(
+                "could not connect to server, please run remote_detector_server.py on the remote machine")
             raise e
         self.socket.setsockopt(zmq.LINGER, -1)
         self.socket.setsockopt(zmq.RCVTIMEO, -1)
@@ -75,6 +76,7 @@ class Titlis(object):
         logger.debug("saved file %s",
             os.path.join(self.storage_path,
                          os.path.basename(remote_file_name)))
+        logger.debug("%s", remote_file_name.split(".")[-2])
         subprocess.check_call("ssh det@{0} 'rm {1}'".format(
             self.host,
             remote_file_name), shell=True)
@@ -90,7 +92,7 @@ class Titlis(object):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    detector = Titlis("129.129.99.119")
+    detector = RemoteDetector("129.129.99.119")
     logger.debug("created")
     message = detector.send_command("echo", "test")
     logger.debug("received echo %s", message)
