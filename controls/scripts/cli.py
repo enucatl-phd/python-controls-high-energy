@@ -16,7 +16,7 @@ import logging
 
 import controls.motors
 import controls.eiger
-import controls.titlis
+import controls.remote_detector
 import controls.pilatus
 import controls.comet_tube
 import controls.scans
@@ -55,7 +55,7 @@ def main(verbose, storage_path, threshold):
     smpltry = controls.motors.Motor("X02DA-BNK-HE:SMPL_TRY", "smpltry")
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
-    detector = controls.titlis.Titlis(
+    detector = controls.remote_detector.RemoteDetector(
         "129.129.99.119",
         storage_path=storage_path,
         photon_energy=[threshold, 2*threshold]
