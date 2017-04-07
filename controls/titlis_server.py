@@ -151,7 +151,7 @@ class TitlisServer(object):
 if __name__ == "__main__":
     import logging.config
     import controls.log_config
-    logging.config.dictConfig(controls.log_config.get_dict(2))
+    logging.config.dictConfig(controls.log_config.get_dict(0))
     logger.debug("starting server")
     server = TitlisServer()
     logger.debug("starting loop")
