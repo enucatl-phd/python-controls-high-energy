@@ -55,16 +55,21 @@ def main(verbose, storage_path, threshold):
     smpltry = controls.motors.Motor("X02DA-BNK-HE:SMPL_TRY", "smpltry")
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
-    detector = controls.remote_detector.RemoteDetector(
-        "129.129.99.119",
-        storage_path=storage_path,
-        photon_energy=[threshold, 2*threshold]
-    )
-    # detector = controls.eiger.Eiger(
-        # "129.129.99.81",
+    # Grating stage for gantry
+    gtrz = controls.motors.Motor("X02DA-BNK-BCT:G_TRZ", "gtrz")
+    grotx = controls.motors.Motor("X02DA-BNK-BCT:G_ROTX", "grotx")
+    groty = controls.motors.Motor("X02DA-BNK-BCT:G_ROTY", "groty")
+    grotz = controls.motors.Motor("X02DA-BNK-BCT:G_ROTZ", "grotz")
+    # detector = controls.remote_detector.RemoteDetector(
+        # "129.129.99.119",
         # storage_path=storage_path,
-        # photon_energy=threshold
+        # photon_energy=[threshold, 2*threshold]
     # )
+    detector = controls.eiger.Eiger(
+        "129.129.99.112",
+        storage_path=storage_path,
+        photon_energy=threshold
+    )
     # detector = controls.pilatus.Pilatus(
      #   "129.129.99.81",
       #  storage_path=storage_path,

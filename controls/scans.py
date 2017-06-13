@@ -39,6 +39,27 @@ def dscan(detector, motor, begin, end, intervals, exposure_time=1):
         logger.debug("going back to initial motor position %s", initial_motor_position)
         motor.mv(initial_motor_position)
 
+def dscan_fake(detector, motor, begin, end, intervals, exposure_time=1):
+    initial_motor_position = motor.get_current_value()
+    logger.debug("initial motor position %s", initial_motor_position)
+    try:
+        motor.mvr(begin)
+        step = (end - begin) / intervals
+		# move motor
+        for i in range(intervals):
+            motor.mvr(step)
+            time.sleep(0.1)
+            logger.info(motor)
+            logger.debug("snap %d, exposure time %s",
+                i + 1,
+                exposure_time
+                )
+            time.sleep(exposure_time) # sleep for expo_time
+        time.sleep(4+4.5) # sleep for saving time
+    finally:
+        logger.debug("going back to initial motor position %s", initial_motor_position)
+        motor.mv(initial_motor_position)
+
 
 def phase_stepping_scan(
         detector, motor, begin, end, intervals,
