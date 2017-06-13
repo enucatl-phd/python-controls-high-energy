@@ -1,4 +1,8 @@
+import datetime
+
 def get_dict(verbose):
+    filename = "log_of_session_started_on_{0}.log".format(
+        datetime.datetime.now().strftime("%y%m%d.%H%M%S%f"))
     levels = [
         'INFO',
         'DEBUG',
@@ -13,14 +17,20 @@ def get_dict(verbose):
                  }
         },
         handlers = {
-            'h': {
+            'console': {
                 'class': 'logging.StreamHandler',
                 'formatter': 'f',
                 'level': levels[verbose],
-            }
+            },
+            'file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'formatter': 'f',
+                'filename': filename,
+                'level': levels[verbose],
+            },
         },
         root = {
-            'handlers': ['h'],
+            'handlers': ['console', 'file'],
             'level': levels[verbose],
         },
     )
