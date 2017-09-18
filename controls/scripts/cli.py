@@ -16,6 +16,7 @@ import logging
 
 import controls.motors
 import controls.eiger
+import controls.remote_detector
 import controls.pilatus
 import controls.hamamatsu_flat_panel
 import controls.comet_tube
@@ -55,12 +56,20 @@ def main(verbose, storage_path, threshold):
     smpltry = controls.motors.Motor("X02DA-BNK-HE:SMPL_TRY", "smpltry")
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
+    detector = controls.remote_detector.RemoteDetector(
+        "129.129.99.119",
+        storage_path=storage_path,
+        photon_energy=[threshold, 2*threshold]
+    )
     # detector = controls.eiger.Eiger(
         # "129.129.99.112",
         # storage_path=storage_path,
         # photon_energy=threshold
     # )
-    detector = controls.hamamatsu_flat_panel.HamamatsuFlatPanel(
-       storage_path=storage_path,
-    )
+    # detector = controls.pilatus.Pilatus(
+     #   "129.129.99.81",
+      #  storage_path=storage_path,
+       # photon_energy=threshold
+    # )
+    tube = controls.comet_tube.CometTube()
     IPython.embed()
