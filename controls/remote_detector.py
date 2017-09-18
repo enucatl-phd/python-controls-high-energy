@@ -41,7 +41,7 @@ class RemoteDetector(object):
         self.socket.setsockopt(zmq.RCVTIMEO, -1)
         for method_name in self.delegated_methods:
             self.add_delegated_method(method_name)
-        self.setThresholds(photon_energy)
+        self.set_energy_and_thresholds(photon_energy)
 
     def send_command(self, method, *args, **kwargs):
         dictionary = {
@@ -61,6 +61,10 @@ class RemoteDetector(object):
         method.__name__ = method_name
         setattr(self.__class__, method_name, method)
 
+    def setNTrigger(self, n): pass
+    def arm(self): pass
+    def disarm(self): pass
+
     def save(self):
         remote_file_name = self.send_command("save")["value"]
         logger.debug("remote file name %s", remote_file_name)
@@ -78,17 +82,13 @@ class RemoteDetector(object):
             remote_file_name), shell=True)
 
     def snap(self, exposure_time=1):
-        self.setNTrigger(1)
-        self.setExposureParameters(exposure_time)
-        self.arm()
         self.trigger(exposure_time)
-        self.disarm()
         self.save()
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    detector = RemoteDetector("129.129.99.119")
+    detector = RemoteDetector("129.129.99.96")
     logger.debug("created")
     message = detector.send_command("echo", "test")
     logger.debug("received echo %s", message)

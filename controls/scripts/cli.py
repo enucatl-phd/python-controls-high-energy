@@ -57,7 +57,7 @@ def main(verbose, storage_path, threshold):
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
     detector = controls.remote_detector.RemoteDetector(
-        "129.129.99.119",
+        "129.129.99.96",
         storage_path=storage_path,
         photon_energy=[threshold, 2*threshold]
     )

@@ -33,6 +33,7 @@ setup(
         'numpy',
         'scipy',
         'click',
+        'pyzmq',
         'ipython',
         'pyepics',
         'h5py',

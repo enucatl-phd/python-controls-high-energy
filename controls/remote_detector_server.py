@@ -30,13 +30,15 @@ class RemoteDetectorServer(object):
         configuration_file = "/home/det/configuration/titlis-75um_2halfmodules.py"
 
         # Create Spluegen Camera Object
-        self.detector = dectris.prototype.PrototypeControl(
+        self.detector = dectris.prototype.PrototypeControl.PrototypeControl(
             receive_ip="10.0.10.1",
             detector_ip="10.0.10.50",
             configuration=configuration_file
         )
+        image_destination_path = "/home/det/data_out/psi_data"
+        self.image_destination_path = image_destination_path
         self.detector.configure_file_output(
-            image_destination_path="/data/PSI_data",
+            image_destination_path=image_destination_path,
             file_name_template=file_name_template)
         self.detector.load_calibration(calibration_path=calibration_path)
 
@@ -74,22 +76,19 @@ class RemoteDetectorServer(object):
     def echo(self, value):
         return value
 
-    def set_energy_and_thresholds(self, energy, thresholds):
+    def set_energy_and_thresholds(self, thresholds):
         return self.detector.set_energy_and_thresholds(
             80000, # fudge useless value
             thresholds=thresholds,
             number_of_thresholds=2)
 
     def save(self):
-        for _ in range(self.n_trigger):
-            self.image_builder.waitImageIsSaved()
-        logger.debug("image saved")
-        now = datetime.datetime.now().strftime("%y%m%d.%H%M%S%f"))
+        now = datetime.datetime.now().strftime("%y%m%d.%H%M%S%f")
         output_file_name = os.path.join(
             self.image_destination_path,
             now + ".h5")
         output_file = h5py.File(output_file_name)
-        groups = ["th_0", "th_1"]
+        groups = ["threshold_0", "threshold_1"]
         for group_name in groups:
             group = output_file.require_group("/entry/data/{0}".format(group_name))
             group_files = sorted(glob.glob(
