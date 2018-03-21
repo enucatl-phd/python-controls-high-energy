@@ -57,10 +57,10 @@ def main(verbose, storage_path, threshold):
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
     # compact dpc experiments
-    stptrx = controls.motors.Motor("X02DA-LAB-CDPC:SMARACT", "smaract")
-    g1rotz = controls.motors.Motor("X02DA-LAB-CDPC:SAM_TRY", "g1rotz")
-    g1trz = controls.motors.Motor("X02DA-LAB:TEST_M2", "g1trz")
-    smpltrx = controls.motors.Motor("X02DA-LAB-CDPC:SAM_TRX", "smpltrx")
+    # stptrx = controls.motors.Motor("X02DA-LAB-CDPC:SMARACT", "smaract")
+    # g1rotz = controls.motors.Motor("X02DA-LAB-CDPC:SAM_TRY", "g1rotz")
+    # g1trz = controls.motors.Motor("X02DA-LAB:TEST_M2", "g1trz")
+    # smpltrx = controls.motors.Motor("X02DA-LAB-CDPC:SAM_TRX", "smpltrx")
     detector = controls.remote_detector.RemoteDetector(
         "129.129.99.73",
         storage_path=storage_path,
