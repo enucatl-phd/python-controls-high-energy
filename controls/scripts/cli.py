@@ -41,7 +41,7 @@ def main(verbose, storage_path, threshold):
     g0roty = controls.motors.Motor("X02DA-BNK-HE:G0_ROTY", "g0roty")
     g0rotz = controls.motors.Motor("X02DA-BNK-HE:G0_ROTZ", "g0rotz")
     g1trx = controls.motors.Motor("X02DA-BNK-HE:G1_TRX", "g1trx")
-    disconnected = controls.motors.Motor("X02DA-BNK-HE:G1_TRY", "g1try")
+    g1try = controls.motors.Motor("X02DA-BNK-HE:G1_TRY", "g1try")
     g1trz = controls.motors.Motor("X02DA-BNK-HE:G1_TRZ", "g1trz")
     g1rotx = controls.motors.Motor("X02DA-BNK-HE:G1_ROTX", "g1rotx")
     g1roty = controls.motors.Motor("X02DA-BNK-HE:G1_ROTY", "g1roty")
@@ -56,6 +56,11 @@ def main(verbose, storage_path, threshold):
     smpltry = controls.motors.Motor("X02DA-BNK-HE:SMPL_TRY", "smpltry")
     smplroty = controls.motors.Motor("X02DA-BNK-HE:SMPL_ROTY", "smplroty")
     stptrx = controls.motors.Motor("X02DA-BNK-HE:STP_TRX", "stptrx")
+	# gantry stage
+    grotx = controls.motors.Motor("X02DA-BNK-BCT:G_ROTX", "grotx")
+    groty = controls.motors.Motor("X02DA-BNK-BCT:G_ROTY", "groty")
+    grotz = controls.motors.Motor("X02DA-BNK-BCT:G_ROTZ", "grotz")
+    gtrz = controls.motors.Motor("X02DA-BNK-BCT:G_TRZ", "gtrz")
     # compact dpc experiments
     # stptrx = controls.motors.Motor("X02DA-LAB-CDPC:SMARACT", "smaract")
     # g1rotz = controls.motors.Motor("X02DA-LAB-CDPC:SAM_TRY", "g1rotz")

@@ -17,7 +17,7 @@ class RemoteDetector(object):
             self,
             host,
             port=5555,
-            photon_energy=[10000, 40000],
+            photon_energy=[15000, 40000],
             storage_path="."):
         super(RemoteDetector, self).__init__()
         self.host = host
@@ -81,8 +81,10 @@ class RemoteDetector(object):
             self.host,
             remote_file_name), shell=True)
 
-    def snap(self, exposure_time=1):
-        self.trigger(exposure_time)
+    def snap(self, exposure_time=1, number_of_images=1, number_of_triggers=1,
+             trigger_mode="ints", dead_time=0.005):
+        self.trigger(exposure_time, number_of_images, number_of_triggers,
+                     trigger_mode, dead_time)
         self.save()
 
 
