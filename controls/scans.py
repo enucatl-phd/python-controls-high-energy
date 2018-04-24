@@ -135,3 +135,13 @@ def phase_stepping_scan_saving_each(
         logger.debug("going back to initial motor position %s", initial_motor_position)
         motor.mv(initial_motor_position)
         phase_stepping_motor.mv(initial_phase_stepping_position)
+
+def stability_scan(detector):
+    for ii in range(0, 360):
+        detector.snap(1)
+        time.sleep(6.41)
+    for ii in range(0, 900):
+        detector.snap(1)
+        time.sleep(56.41)
+
+
