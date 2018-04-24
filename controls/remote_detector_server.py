@@ -24,10 +24,10 @@ class RemoteDetectorServer(object):
         self.number_of_thresholds = 2
 
         # # Detector Calibration File
-        calibration_path = "/home/det/calibrations/calibration-T0804_75-01_20170522_14h02m20"
+        calibration_path = "/home/det/calibration-T2402-75_01_midgR_20180116_11h18m07/"
 
         # Detector Configuration File
-        configuration_file = "/home/det/configuration/titlis-75um_2halfmodules.py"
+        configuration_file = "/home/det/configuration_file/titlis_75_24_02_configuration.py"
 
         # Create Spluegen Camera Object
         self.detector = dectris.prototype.PrototypeControl.PrototypeControl(
@@ -42,12 +42,15 @@ class RemoteDetectorServer(object):
             file_name_template=file_name_template)
         self.detector.load_calibration(calibration_path=calibration_path)
 
-    def trigger(self, exposure_time=1):
+    def trigger(self, exposure_time=1, number_of_images=1,
+                number_of_triggers=1, trigger_mode="ints", dead_time=0.005):
+        image_period = exposure_time + dead_time
         self.detector.acquire_images(
             count_time=exposure_time,
-            number_of_images=1,
-            number_of_triggers=1,
-            trigger_mode="ints")
+            number_of_images=number_of_images,
+            number_of_triggers=number_of_triggers,
+            trigger_mode=trigger_mode,
+            image_period=image_period)
 
     def loop(self):
         while True:
